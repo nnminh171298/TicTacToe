@@ -7,6 +7,22 @@ GameEngine::GameEngine(QObject *parent) : QObject(parent)
 {
 }
 
+void GameEngine::start()
+{
+    computerFirstOriginNode = new Node;
+    playerFirstOriginNode = new Node;
+    QElapsedTimer myTimer;
+    myTimer.start();
+    QFuture<Node *> f1 = QtConcurrent::run(this, &GameEngine::generateNodes, nullptr, board, true);
+    QFuture<Node *> f2 = QtConcurrent::run(this, &GameEngine::generateNodes, nullptr, board, false);
+    f1.waitForFinished();
+    f2.waitForFinished();
+    computerFirstOriginNode = f1.result();
+    playerFirstOriginNode = f2.result();
+    qDebug() << myTimer.elapsed();
+    emit ready();
+}
+
 void GameEngine::playerMoveMade(int cellNumber)
 {
     if(board.at(cellNumber) != None || !playerTurn)
@@ -14,7 +30,7 @@ void GameEngine::playerMoveMade(int cellNumber)
 
     playerTurn = false;
     emit displayMove(cellNumber, false);
-    GameStatus status = getBoardStatus();
+    GameStatus status = getBoardStatus(board);
     emit updateBoardStatus(status);
 
     board[cellNumber] = Player;
@@ -30,27 +46,27 @@ void GameEngine::playerMoveMade(int cellNumber)
 void GameEngine::reset()
 {
     playerTurn = false;
-    if(originNode)
-    {
-        delete originNode;
-        originNode = nullptr;
-    }
-    originNode = new Node;
-    currentNode = originNode;
     board.fill(None, CELL_COUNT);
 }
 
 void GameEngine::goFirst(bool computerFirst)
 {
-    generateNodes(originNode, computerFirst);
     if(computerFirst)
+    {
+        currentNode = computerFirstOriginNode;
         makeComputerMove(alphaBeta(currentNode, MIN, MAX, true));
+    }
     else
+    {
+        currentNode = playerFirstOriginNode;
         playerTurn = true;
+    }
 }
 
-void GameEngine::generateNodes(Node *parentNode, const bool computerMove)
+Node *GameEngine::generateNodes(Node *parentNode, QVector<int> board, const bool computerMove)
 {
+    if(parentNode == nullptr)
+        parentNode = new Node;
     for(int i=1; i<CELL_COUNT; i++)
     {
         if(board.at(i) == None)
@@ -64,7 +80,7 @@ void GameEngine::generateNodes(Node *parentNode, const bool computerMove)
             else
                 board[i] = Player;
 
-            GameStatus status = getBoardStatus();
+            GameStatus status = getBoardStatus(board);
             switch(status)
             {
             case Win:
@@ -79,14 +95,15 @@ void GameEngine::generateNodes(Node *parentNode, const bool computerMove)
                 childNode->terminateNode = true;
                 break;
             case Unknown:
-                generateNodes(childNode, !computerMove);
+                generateNodes(childNode, board, !computerMove);
             }
             board[i] = None;
         }
     }
+    return parentNode;
 }
 
-GameEngine::GameStatus GameEngine::getBoardStatus()
+GameEngine::GameStatus GameEngine::getBoardStatus(QVector<int> board)
 {
     const QVector<QVector<int>> winPositions = {{1,2,3}, {4,5,6}, {7,8,9}, {1,5,9},
                                                 {1,4,7}, {2,5,8}, {3,6,9}, {3,5,7}};
@@ -130,7 +147,7 @@ qint8 GameEngine::alphaBeta(Node *currentNode, qint8 alpha, qint8 beta, const bo
             heuristicValue = qMax(heuristicValue, alphaBeta(childList.at(i), alpha, beta, false));
             currentNode->heuristicValue = heuristicValue;
             alpha = qMax(alpha, heuristicValue);
-            if(alpha > beta)
+            if(alpha > beta)    // don't put "=" here, the cutoff-ed nodes also have heuristic value of 0, which will be mistaken with the tie nodes
                 break;
         }
         return heuristicValue;
@@ -181,7 +198,7 @@ void GameEngine::makeComputerMove(qint8 heuristicValue)
         emit displayMove(cellNumber, true, cellList, heuristicValue);
     }
 
-    GameStatus status = getBoardStatus();
+    GameStatus status = getBoardStatus(board);
     emit updateBoardStatus(status);
     if(status == Unknown)
         playerTurn = true;

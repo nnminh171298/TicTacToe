@@ -29,9 +29,11 @@ private slots:
     void displayMove(int cellNumber, bool computerMove, const QList<int> choiceList, const qint8 heuristicValue);
     void goFirst();
     void reset();
+    void ready();
 
 signals:
     void playerMoveMade(int cellNumber);
+    void start();
 
 private:
     void makeGameBox();
@@ -49,6 +51,9 @@ private:
     QLineEdit *boardStatusEdit;
     QLineEdit *computerChoicesEdit;
     QLineEdit *computerAnalysisEdit;
+    QLabel *programStatusLabel;
+
+    int scaledDimension;
 };
 
 #endif // MAINWINDOW_H

@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QVector>
 #include <QRandomGenerator>
+#include <QFuture>
+#include <QtConcurrent/QtConcurrentRun>
 QT_BEGIN_NAMESPACE
 class Node;
 QT_END_NAMESPACE
@@ -19,15 +21,17 @@ public:
 signals:
     void displayMove(int cellNumber, bool computerMove, const QList<int> choiceList = QList<int>(), const qint8 heuristicValue = 0);
     void updateBoardStatus(int status);
+    void ready();
 
 public slots:
+    void start();
     void playerMoveMade(int cellNumber);
     void reset();
     void goFirst(bool computerFirst);
 
 private:
-    void generateNodes(Node *parentNode, const bool computerMove);
-    GameStatus getBoardStatus();
+    Node *generateNodes(Node *parentNode, QVector<int> board, const bool computerMove);
+    GameStatus getBoardStatus(QVector<int> board);
     qint8 alphaBeta(Node *currentNode, qint8 alpha, qint8 beta, const bool maximizingPlayer = true);
     void makeComputerMove(qint8 heuristicValue);
 
@@ -36,7 +40,8 @@ private:
     qint8 MAX = std::numeric_limits<qint8>::max();
     QVector<int> board;
     bool playerTurn;
-    Node *originNode = nullptr;
+    Node *computerFirstOriginNode = nullptr;
+    Node *playerFirstOriginNode = nullptr;
     Node *currentNode;
 };
 

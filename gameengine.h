@@ -6,6 +6,9 @@
 #include <QRandomGenerator>
 #include <QFuture>
 #include <QtConcurrent/QtConcurrentRun>
+#include <QDebug>
+#include <QElapsedTimer>
+
 QT_BEGIN_NAMESPACE
 class Node;
 QT_END_NAMESPACE
@@ -19,7 +22,7 @@ public:
     enum GameStatus{Lose = 0, Win, Tie, Unknown};
 
 signals:
-    void displayMove(int cellNumber, bool computerMove, const QList<int> choiceList = QList<int>(), const qint8 heuristicValue = 0);
+    void validMoveMade(int cellNumber, bool computerMove, const QList<int> choiceList = QList<int>(), const qint8 heuristicValue = 0);
     void updateBoardStatus(int status);
     void ready();
 
@@ -36,8 +39,8 @@ private:
     void makeComputerMove(qint8 heuristicValue);
 
     const int CELL_COUNT = 10;  // a blank cell at the start for readability
-    qint8 MIN = std::numeric_limits<qint8>::min();
-    qint8 MAX = std::numeric_limits<qint8>::max();
+    const qint8 MIN = std::numeric_limits<qint8>::min();
+    const qint8 MAX = std::numeric_limits<qint8>::max();
     QVector<int> board;
     bool playerTurn;
     Node *computerFirstOriginNode = nullptr;

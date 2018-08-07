@@ -1,7 +1,5 @@
 #include "gameengine.h"
 #include "node.h"
-#include <QDebug>
-#include <QElapsedTimer>
 
 GameEngine::GameEngine(QObject *parent) : QObject(parent)
 {
@@ -11,14 +9,17 @@ void GameEngine::start()
 {
     computerFirstOriginNode = new Node;
     playerFirstOriginNode = new Node;
+
     QElapsedTimer myTimer;
     myTimer.start();
+
     QFuture<Node *> f1 = QtConcurrent::run(this, &GameEngine::generateNodes, nullptr, board, true);
     QFuture<Node *> f2 = QtConcurrent::run(this, &GameEngine::generateNodes, nullptr, board, false);
     f1.waitForFinished();
     f2.waitForFinished();
     computerFirstOriginNode = f1.result();
     playerFirstOriginNode = f2.result();
+
     qDebug() << myTimer.elapsed();
     emit ready();
 }
@@ -29,7 +30,7 @@ void GameEngine::playerMoveMade(int cellNumber)
         return;
 
     playerTurn = false;
-    emit displayMove(cellNumber, false);
+    emit validMoveMade(cellNumber, false);
     GameStatus status = getBoardStatus(board);
     emit updateBoardStatus(status);
 
@@ -195,7 +196,7 @@ void GameEngine::makeComputerMove(qint8 heuristicValue)
         int childIndex = board.mid(1, cellNumber).count(None);
         currentNode = childList.at(childIndex);
 
-        emit displayMove(cellNumber, true, cellList, heuristicValue);
+        emit validMoveMade(cellNumber, true, cellList, heuristicValue);
     }
 
     GameStatus status = getBoardStatus(board);

@@ -7,4 +7,4 @@ There is also a similar release on [Google Play](https://play.google.com/store/a
 
 ## Screenshot:
 
-![screenshot](https://user-images.githubusercontent.com/24993267/43577176-d40e7cc2-9653-11e8-8a53-768c68a849aa.png)
+![screenshot_20180807-233202](https://user-images.githubusercontent.com/24993267/43821408-c380081a-9af1-11e8-9e1d-fde06fc9989a.png)

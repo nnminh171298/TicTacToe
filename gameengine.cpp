@@ -193,7 +193,7 @@ void GameEngine::makeComputerMove(qint8 heuristicValue)
         board[cellNumber] = Computer;
 
         // increment current node to computer last move
-        int childIndex = board.mid(1, cellNumber).count(None);
+        int childIndex = board.mid(1, cellNumber).count(None);  // there are x None cells before the cell numbered x
         currentNode = childList.at(childIndex);
 
         emit validMoveMade(cellNumber, true, cellList, heuristicValue);

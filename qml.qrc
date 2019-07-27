@@ -1,10 +1,17 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
-        <file>images/blank.png</file>
-        <file>images/icon-computer.png</file>
-        <file>images/icon-player.png</file>
-        <file>images/O.png</file>
-        <file>images/X.png</file>
+        <file>qml/AnalysisControl.qml</file>
+        <file>qml/AnalysisView.qml</file>
+        <file>qml/Board.qml</file>
+        <file>qml/Cell.qml</file>
+        <file>qml/Circle.qml</file>
+        <file>qml/CustomButton.qml</file>
+        <file>qml/main.qml</file>
+        <file>qml/MainControl.qml</file>
+        <file>qml/CustomDrawer.qml</file>
+        <file>qml/MenuAbout.qml</file>
+        <file>qml/MenuHelp.qml</file>
+        <file>qml/MenuLine.qml</file>
+        <file>qml/MenuMode.qml</file>
     </qresource>
 </RCC>

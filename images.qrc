@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/play.svg</file>
+        <file>images/redo.svg</file>
+        <file>images/setting.svg</file>
+        <file>images/undo.svg</file>
+    </qresource>
+</RCC>

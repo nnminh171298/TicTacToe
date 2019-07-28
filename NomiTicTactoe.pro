@@ -41,7 +41,7 @@ contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
         $$PWD/android
 }
 
-# The application version
+RC_ICONS = $$PWD/images/NomiT3-icon.ico
 VERSION = 2.0.1
 
 # Define the preprocessor macro to get the application version in our application.

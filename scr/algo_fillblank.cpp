@@ -7,8 +7,3 @@ int Algo_fillBlank::getNextMove(const Board &board)
             return i;
     return -1;
 }
-
-QString Algo_fillBlank::getAlgoName() const
-{
-    return "Fill blank";
-}

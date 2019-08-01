@@ -9,7 +9,6 @@ public:
     explicit Algo_fillBlank() = default;
 
     int getNextMove(const Board &board) override;
-    QString getAlgoName() const override;
 };
 
 #endif // ALGO_FILLBLANK_H

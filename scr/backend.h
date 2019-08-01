@@ -1,7 +1,6 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 
-#include <QHash>
 #include <QObject>
 
 #include "algo.h"
@@ -26,7 +25,7 @@ public slots:
     void boardClicked(int index);
     void undoClicked();
     void redoClicked();
-    void modeChanged(const QString &mode_title);
+    void modeChanged(int index);
 
 private slots:
     void setMainBoard(const Board &board);
@@ -37,7 +36,7 @@ private:
     void createAlgorithms();
 
     GameEngine *_game_engine;
-    QHash<QString, std::shared_ptr<Algo>> _algo_map;
+    QList<std::shared_ptr<Algo>> _algo_list;
 
     const QString _red500{"#f44336"};
     const QString _blue500{"#2196f3"};

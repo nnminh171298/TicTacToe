@@ -29,7 +29,7 @@ Rectangle {
             onCheckedChanged: {
                 modeMenuModel.set(index, { isChecked: checked });
                 if(checked)
-                    backend.modeChanged(titleText);
+                    backend.modeChanged(index);
             }
         }
     }

@@ -13,14 +13,18 @@ public:
     enum CellStatus : quint8 {Player, Computer, None};
     enum BoardStatus: quint8 {Lose, SubLose, Tie, Unknown, SubWin, Win};
 
-    void        reset();
-    int         at(int index) const;
-    void        setCell(int index, CellStatus value);
+    void reset();
+    int at(int index) const;
+    void setCell(int index, CellStatus value);
+    void setComputerFirst(bool computer_first);
+    bool isComputerFirst() const;
+    bool isComputerTurn() const;
 
     BoardStatus status() const;
 
 private:
     QVector<CellStatus> _board;
+    bool _computer_first;
 };
 
 #endif // BOARD_H

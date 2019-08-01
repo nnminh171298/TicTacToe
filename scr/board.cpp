@@ -52,3 +52,23 @@ void Board::setCell(int index, Board::CellStatus value)
 {
     _board[index] = value;
 }
+
+void Board::setComputerFirst(bool computer_first)
+{
+    _computer_first = computer_first;
+}
+
+bool Board::isComputerFirst() const
+{
+    return _computer_first;
+}
+
+bool Board::isComputerTurn() const
+{
+    auto computer_count = count(begin(_board), end(_board), CellStatus::Computer);
+    auto player_count = count(begin(_board), end(_board), CellStatus::Player);
+    if(computer_count == player_count)
+        return _computer_first;
+    else
+        return player_count > computer_count;
+}

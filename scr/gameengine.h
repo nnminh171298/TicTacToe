@@ -42,7 +42,6 @@ private:
 
     QTimer *_make_comp_move_timer;
     bool _is_making_comp_move;
-    bool _computer_first;
     int _last_move_ptr;
 };
 

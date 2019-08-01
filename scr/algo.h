@@ -9,8 +9,7 @@ public:
     explicit Algo() = default;
     virtual ~Algo() = default;
 
-    virtual Board::BoardStatus evaluateBoard(const Board &board, bool is_computer_turn);
-    virtual QString getAlgoName() const = 0;
+    virtual Board::BoardStatus evaluateBoard(const Board &board);
     virtual int getNextMove(const Board &board) = 0;
 };
 

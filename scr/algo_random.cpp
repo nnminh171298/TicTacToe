@@ -15,8 +15,3 @@ int Algo_random::getNextMove(const Board &board)
 
     return none_indexes.first();
 }
-
-QString Algo_random::getAlgoName() const
-{
-    return "Random";
-}

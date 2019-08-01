@@ -8,7 +8,7 @@ Backend::Backend(QObject *parent) : QObject(parent)
 {
     createAlgorithms();
     _game_engine = new GameEngine(this);
-    _game_engine->setAlgo(_algo_map.value((*begin(_algo_map)).get()->getAlgoName()));
+    _game_engine->setAlgo(_algo_list.first());
     connect(_game_engine, &GameEngine::setMainBoard, this, &Backend::setMainBoard);
     connect(_game_engine, &GameEngine::setSubBoard, this, &Backend::setSubBoard);
 }
@@ -33,10 +33,9 @@ void Backend::redoClicked()
     _game_engine->redo();
 }
 
-void Backend::modeChanged(const QString &mode_title)
+void Backend::modeChanged(int index)
 {
-    QString algo_name = mode_title.split(" (").first();
-    _game_engine->setAlgo(_algo_map.value(algo_name, _algo_map.value((*begin(_algo_map)).get()->getAlgoName())));
+    _game_engine->setAlgo(_algo_list[index]);
 }
 
 void Backend::setMainBoard(const Board &board)
@@ -127,11 +126,12 @@ void Backend::createAlgorithms()
     generator->generate();
 
     auto algo_minimax = std::make_shared<Algo_minimax>(generator);
-    _algo_map.insert(algo_minimax->getAlgoName(), algo_minimax);
+    algo_minimax->setDepth(2);
+    _algo_list.append(algo_minimax);
 
     auto algo_fillBlank = std::make_shared<Algo_fillBlank>();
-    _algo_map.insert(algo_fillBlank->getAlgoName(), algo_fillBlank);
+    _algo_list.append(algo_fillBlank);
 
     auto algo_random = std::make_shared<Algo_random>();
-    _algo_map.insert(algo_random->getAlgoName(), algo_random);
+    _algo_list.append(algo_random);
 }

@@ -20,10 +20,10 @@ void GameEngine::setAlgo(std::shared_ptr<Algo> algo)
 void GameEngine::reset(bool computer_first)
 {
     stopMakeCompMoveTimer();
-    _computer_first = computer_first;
     _last_move_ptr = -1;
     _move_history.clear();
     _board.reset();
+    _board.setComputerFirst(computer_first);
 
     if(isComputerTurn())
         startMakeCompMoveTimer();
@@ -38,7 +38,7 @@ int GameEngine::getMoveNum() const
 
 bool GameEngine::isComputerTurn() const
 {
-    return (getMoveNum() % 2) == static_cast<int>(_computer_first);
+    return _board.isComputerTurn();
 }
 
 bool GameEngine::isUndoAvailable() const
@@ -131,7 +131,7 @@ void GameEngine::sendSubBoards()
         if(_board.status() == Board::Unknown && _board.at(i) == Board::CellStatus::None)
         {
             _board.setCell(i, current_player);
-            emit setSubBoard(i, _board, _algo->evaluateBoard(_board, !isComputerTurn()));
+            emit setSubBoard(i, _board, _algo->evaluateBoard(_board));
             _board.setCell(i, Board::CellStatus::None);
         }
         else

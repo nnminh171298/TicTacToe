@@ -6,54 +6,58 @@
 #include <random>
 using namespace std;
 
-Algo_minimax::Algo_minimax(std::shared_ptr<GameTreeGenerator> generator) : _generator{generator}
+Algo_minimax::Algo_minimax(std::shared_ptr<GameTreeGenerator> generator)
+    : _generator{generator}
 {
-
+    _depth = std::numeric_limits<quint8>::max();
 }
 
-Board::BoardStatus Algo_minimax::evaluateBoard(const Board &board, bool is_computer_turn)
+void Algo_minimax::setDepth(quint8 depth)
 {
-    _current_node = _generator->getNode(board);
-    if(_current_node != nullptr)
-        return alphaBeta(_current_node, is_computer_turn);
+    _depth = depth;
+}
 
-    _current_node = _generator->getNode(flipBoard(board));
-    if(_current_node != nullptr)
+Board::BoardStatus Algo_minimax::evaluateBoard(const Board &board)
+{
+    if(board.isComputerFirst())
     {
-        auto flipped_status = alphaBeta(_current_node, !is_computer_turn);
-        switch(flipped_status)
-        {
-        case Board::Win:
-            return Board::Lose;
-        case Board::SubWin:
-            return Board::SubLose;
-        case Board::SubLose:
-            return Board::SubWin;
-        case Board::Lose:
-            return Board::Win;
-        default:
-            return flipped_status;
-        }
+        _current_node = _generator->getNode(board);
+        if(_current_node == nullptr)
+            return Board::Unknown;
+        return alphaBeta(_current_node, _depth, board.isComputerTurn());
     }
 
-    return Board::Unknown;
+    Board flipped_board{flipBoard(board)};
+    _current_node = _generator->getNode(flipped_board);
+    if(_current_node == nullptr)
+        return Board::Unknown;
+    auto flipped_status = alphaBeta(_current_node, _depth, flipped_board.isComputerTurn());
+    switch(flipped_status)
+    {
+    case Board::Win:
+        return Board::Lose;
+    case Board::SubWin:
+        return Board::SubLose;
+    case Board::SubLose:
+        return Board::SubWin;
+    case Board::Lose:
+        return Board::Win;
+    default:
+        return flipped_status;
+    }
 }
 
 int Algo_minimax::getNextMove(const Board &board)
 {
-    auto status = evaluateBoard(board, true);
+    auto status = evaluateBoard(board);
     if(status == Board::Unknown)
         return Algo_random().getNextMove(board);
 
     auto child_list = _current_node->children();
     QList<int> chosen_list;
     for(auto iter=begin(child_list); iter!=end(child_list); iter++)
-    {
-        if(iter.value()->isEndNode() == true && iter.value()->status() == Board::Win)
-            return iter.key();
-        if(alphaBeta(iter.value(), _generator->getNode(board) == nullptr) == status)
+        if(alphaBeta(iter.value(), _depth-1, _generator->getNode(board) == nullptr) == status)
             chosen_list.append(iter.key());
-    }
     if(chosen_list.length() == 0)
         return Algo_random().getNextMove(board);
 
@@ -63,14 +67,9 @@ int Algo_minimax::getNextMove(const Board &board)
     return chosen_list.first();
 }
 
-QString Algo_minimax::getAlgoName() const
+Board::BoardStatus Algo_minimax::alphaBeta(GameNode *node, quint8 depth, bool maximizing_player, Board::BoardStatus alpha, Board::BoardStatus beta)
 {
-    return "Minimax";
-}
-
-Board::BoardStatus Algo_minimax::alphaBeta(GameNode *node, bool maximizing_player, Board::BoardStatus alpha, Board::BoardStatus beta)
-{
-    if(node->isEndNode())
+    if(node->isEndNode() || depth <= 0)
         return node->status();
 
     if(maximizing_player)
@@ -79,7 +78,8 @@ Board::BoardStatus Algo_minimax::alphaBeta(GameNode *node, bool maximizing_playe
         auto child_list = node->children();
         for(auto iter=begin(child_list); iter!=end(child_list); iter++)
         {
-            best_status = qMax(best_status, alphaBeta(iter.value(), false, alpha, beta));
+            auto child_status = alphaBeta(iter.value(), depth-1, false, alpha, beta);
+            best_status = qMax(best_status, childStatusToParentStatus(child_status));
             alpha = qMax(alpha, best_status);
             if(alpha >= beta)
                 break;
@@ -92,7 +92,8 @@ Board::BoardStatus Algo_minimax::alphaBeta(GameNode *node, bool maximizing_playe
         auto child_list = node->children();
         for(auto iter=begin(child_list); iter!=end(child_list); iter++)
         {
-            worst_status = qMin(worst_status, alphaBeta(iter.value(), true, alpha, beta));
+            auto child_status = alphaBeta(iter.value(), depth-1, true, alpha, beta);
+            worst_status = qMin(worst_status, childStatusToParentStatus(child_status));
             beta = qMin(beta, worst_status);
             if(alpha >= beta)
                 break;
@@ -104,6 +105,7 @@ Board::BoardStatus Algo_minimax::alphaBeta(GameNode *node, bool maximizing_playe
 Board Algo_minimax::flipBoard(const Board &board)
 {
     Board flipped_board;
+    flipped_board.setComputerFirst(!board.isComputerFirst());
     for(int i=0; i<Board::CELL_COUNT; i++)
     {
         switch(board.at(i))
@@ -120,4 +122,17 @@ Board Algo_minimax::flipBoard(const Board &board)
         }
     }
     return flipped_board;
+}
+
+Board::BoardStatus Algo_minimax::childStatusToParentStatus(Board::BoardStatus child_status)
+{
+    switch(child_status)
+    {
+    case Board::Win:
+        return Board::SubWin;
+    case Board::Lose:
+        return Board::SubLose;
+    default:
+        return child_status;
+    }
 }

@@ -4,34 +4,77 @@
 #include "gametreegenerator.h"
 
 #include <random>
+#include <QDebug>
 using namespace std;
 
 Algo_minimax::Algo_minimax(std::shared_ptr<GameTreeGenerator> generator)
     : _generator{generator}
 {
-    _depth = std::numeric_limits<quint8>::max();
+    setMaxDepth();
 }
 
-void Algo_minimax::setDepth(quint8 depth)
+void Algo_minimax::setMaxDepth(quint8 max_depth)
 {
-    _depth = depth;
+    _depth = max_depth;
 }
 
 Board::BoardStatus Algo_minimax::evaluateBoard(const Board &board)
 {
+    // interface for game engine to call, always call for sub boards
+    return evaluateBoardWithDepth(board, _depth - 1);
+}
+
+int Algo_minimax::getNextMove(Board board)
+{
+    Board::BoardStatus max_status = Board::Lose;
+    QList<int> chosen_list;
+    Board::CellStatus current_player = board.isComputerTurn() ? Board::CellStatus::Computer : Board::CellStatus::Player;
+
+    for(int i=0; i<Board::CELL_COUNT; i++)
+    {
+        if(board.at(i) != Board::CellStatus::None)
+            continue;
+
+        board.setCell(i, current_player);
+        auto sub_board_status = evaluateBoardWithDepth(board, _depth-1);
+        if(sub_board_status == max_status)
+            goto TO_BE_CONSIDERED;
+        if(sub_board_status < max_status)
+            goto RESET_BOARD;
+
+        chosen_list.clear();
+        max_status = sub_board_status;
+
+    TO_BE_CONSIDERED:
+        chosen_list.append(i);
+    RESET_BOARD:
+        board.setCell(i, Board::CellStatus::None);
+    }
+    if(chosen_list.length() == 0)
+        return Algo_random().getNextMove(board);
+    qDebug() << chosen_list;
+
+    random_device random_device;
+    mt19937 generator(random_device());
+    shuffle(begin(chosen_list), end(chosen_list), generator);
+    return chosen_list.first();
+}
+
+Board::BoardStatus Algo_minimax::evaluateBoardWithDepth(const Board &board, quint8 depth)
+{
     if(board.isComputerFirst())
     {
-        _current_node = _generator->getNode(board);
-        if(_current_node == nullptr)
+        auto node = _generator->getNode(board);
+        if(node == nullptr)
             return Board::Unknown;
-        return alphaBeta(_current_node, _depth, board.isComputerTurn());
+        return alphaBeta(node, depth, board.isComputerTurn());
     }
 
     Board flipped_board{flipBoard(board)};
-    _current_node = _generator->getNode(flipped_board);
-    if(_current_node == nullptr)
+    auto node = _generator->getNode(flipped_board);
+    if(node == nullptr)
         return Board::Unknown;
-    auto flipped_status = alphaBeta(_current_node, _depth, flipped_board.isComputerTurn());
+    auto flipped_status = alphaBeta(node, depth, flipped_board.isComputerTurn());
     switch(flipped_status)
     {
     case Board::Win:
@@ -45,24 +88,6 @@ Board::BoardStatus Algo_minimax::evaluateBoard(const Board &board)
     default:
         return flipped_status;
     }
-}
-
-int Algo_minimax::getNextMove(const Board &board)
-{
-    auto status = evaluateBoard(board);
-
-    auto child_list = _current_node->children();
-    QList<int> chosen_list;
-    for(auto iter=begin(child_list); iter!=end(child_list); iter++)
-        if(alphaBeta(iter.value(), _depth-1, !board.isComputerTurn()) == status)
-            chosen_list.append(iter.key());
-    if(chosen_list.length() == 0)
-        return Algo_random().getNextMove(board);
-
-    random_device random_device;
-    mt19937 generator(random_device());
-    shuffle(begin(chosen_list), end(chosen_list), generator);
-    return chosen_list.first();
 }
 
 Board::BoardStatus Algo_minimax::alphaBeta(GameNode *node, quint8 depth, bool maximizing_player, Board::BoardStatus alpha, Board::BoardStatus beta)

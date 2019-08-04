@@ -11,6 +11,7 @@ Board::Board(QObject *parent) : QObject(parent)
 Board::Board(const Board &board)
 {
     _board = board._board;
+    _computer_first = board._computer_first;
 }
 
 void Board::reset()

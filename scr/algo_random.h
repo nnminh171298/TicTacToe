@@ -8,7 +8,7 @@ class Algo_random : public Algo
 public:
     explicit Algo_random() = default;
 
-    int getNextMove(const Board &board) override;
+    int getNextMove(Board board) override;
 };
 
 #endif // ALGO_RANDOM_H

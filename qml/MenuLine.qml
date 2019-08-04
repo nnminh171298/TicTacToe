@@ -39,7 +39,7 @@ Button {
             id: movePlayerText
             text: menuLine.description
             Layout.alignment: Qt.AlignHCenter | Qt.AlignLeft
-            font.pointSize: Qt.platform.os == "Android" ? 10 : 7
+            font.pointSize: Qt.platform.os == "Android" ? 10 : 8
             color: menuLine.checked ? "#4DD0E1" : "#ffffff"
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignLeft

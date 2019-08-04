@@ -8,9 +8,9 @@ Drawer {
 
     ListModel {
         id: drawerModel
-        ListElement { title: "Mode" }
-        ListElement { title: "Help" }
-        ListElement { title: "About" }
+        ListElement { title: "Mode"; isChecked: true }
+        ListElement { title: "Help"; isChecked: false }
+        ListElement { title: "About"; isChecked: false }
     }
 
     Rectangle {
@@ -30,6 +30,7 @@ Drawer {
                 width: parent.width
                 height: rhs.lineHeight
                 autoExclusive: true;
+                checked: isChecked
                 onCheckedChanged: checked ? rhsView.currentIndex = index : undefined;
 
                 contentItem: Text {
@@ -64,7 +65,7 @@ Drawer {
         Item {
             id: rhsView
             anchors.fill: parent
-            property int currentIndex: -1
+            property int currentIndex: 0
 
             MenuMode {
                 id: modeMenu

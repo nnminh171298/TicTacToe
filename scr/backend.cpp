@@ -1,4 +1,3 @@
-#include "algo_fillblank.h"
 #include "algo_minimax.h"
 #include "algo_random.h"
 #include "backend.h"
@@ -8,7 +7,7 @@ Backend::Backend(QObject *parent) : QObject(parent)
 {
     createAlgorithms();
     _game_engine = new GameEngine(this);
-    _game_engine->setAlgo(_algo_list.first());
+    _game_engine->setAlgo(_algo_list[2]);
     connect(_game_engine, &GameEngine::setMainBoard, this, &Backend::setMainBoard);
     connect(_game_engine, &GameEngine::setSubBoard, this, &Backend::setSubBoard);
 }
@@ -122,16 +121,21 @@ void Backend::setAnalysisToolbarText(Board::BoardStatus board_status)
 
 void Backend::createAlgorithms()
 {
+    auto algo_random = std::make_shared<Algo_random>();
+    _algo_list.append(algo_random);
+
     auto generator = std::make_shared<GameTreeGenerator>();
     generator->generate();
 
-    auto algo_minimax = std::make_shared<Algo_minimax>(generator);
-    algo_minimax->setDepth(2);
-    _algo_list.append(algo_minimax);
+    auto algo_minimax_easy = std::make_shared<Algo_minimax>(generator);
+    algo_minimax_easy->setMaxDepth(2);
+    _algo_list.append(algo_minimax_easy);
 
-    auto algo_fillBlank = std::make_shared<Algo_fillBlank>();
-    _algo_list.append(algo_fillBlank);
+    auto algo_minimax_medium = std::make_shared<Algo_minimax>(generator);
+    algo_minimax_medium->setMaxDepth(4);
+    _algo_list.append(algo_minimax_medium);
 
-    auto algo_random = std::make_shared<Algo_random>();
-    _algo_list.append(algo_random);
+    auto algo_minimax_hard = std::make_shared<Algo_minimax>(generator);
+    algo_minimax_hard->setMaxDepth();
+    _algo_list.append(algo_minimax_hard);
 }

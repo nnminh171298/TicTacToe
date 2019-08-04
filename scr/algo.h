@@ -10,7 +10,7 @@ public:
     virtual ~Algo() = default;
 
     virtual Board::BoardStatus evaluateBoard(const Board &board);
-    virtual int getNextMove(const Board &board) = 0;
+    virtual int getNextMove(Board board) = 0;
 };
 
 #endif // ALGO_H

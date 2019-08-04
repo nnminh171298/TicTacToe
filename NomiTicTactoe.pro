@@ -49,7 +49,6 @@ DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 HEADERS += \
     scr/algo.h \
-    scr/algo_fillblank.h \
     scr/algo_minimax.h \
     scr/algo_random.h \
     scr/backend.h \
@@ -60,7 +59,6 @@ HEADERS += \
 
 SOURCES += \
     scr/algo.cpp \
-    scr/algo_fillblank.cpp \
     scr/algo_minimax.cpp \
     scr/algo_random.cpp \
     scr/backend.cpp \

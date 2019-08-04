@@ -2,7 +2,7 @@
 #include <random>
 using namespace std;
 
-int Algo_random::getNextMove(const Board &board)
+int Algo_random::getNextMove(Board board)
 {
     QVector<int> none_indexes;
     for(int i=0; i<Board::CELL_COUNT; i++)

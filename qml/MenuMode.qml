@@ -8,10 +8,10 @@ Rectangle {
 
     ListModel {
         id: modeMenuModel
-        // the title text before " (" have to match with Algo.getAlgoName()
-        ListElement { titleText: "Minimax (Hard)"; isChecked: true; descriptionText: "Result from minimax algorithm" }
-        ListElement { titleText: "Fill blank (Easy)"; isChecked: false; descriptionText: "Fill the first empty cell found" }
         ListElement { titleText: "Random (Maybe easy?)"; isChecked: false; descriptionText: "May the force be with you" }
+        ListElement { titleText: "Minimax (Easy)"; isChecked: false; descriptionText: "Minimax depth 2" }
+        ListElement { titleText: "Minimax (Medium)"; isChecked: true; descriptionText: "Minimax depth 4" }
+        ListElement { titleText: "Minimax (Hard)"; isChecked: false; descriptionText: "Minimax full depth" }
     }
 
     ListView {

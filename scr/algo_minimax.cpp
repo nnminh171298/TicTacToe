@@ -50,13 +50,11 @@ Board::BoardStatus Algo_minimax::evaluateBoard(const Board &board)
 int Algo_minimax::getNextMove(const Board &board)
 {
     auto status = evaluateBoard(board);
-    if(status == Board::Unknown)
-        return Algo_random().getNextMove(board);
 
     auto child_list = _current_node->children();
     QList<int> chosen_list;
     for(auto iter=begin(child_list); iter!=end(child_list); iter++)
-        if(alphaBeta(iter.value(), _depth-1, _generator->getNode(board) == nullptr) == status)
+        if(alphaBeta(iter.value(), _depth-1, !board.isComputerTurn()) == status)
             chosen_list.append(iter.key());
     if(chosen_list.length() == 0)
         return Algo_random().getNextMove(board);
